@@ -1,237 +1,202 @@
-/*
-	Big Picture by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
-*/
-
 (function($) {
 
-	skel.breakpoints({
-		xxlarge: '(max-width: 1920px)',
-		xlarge: '(max-width: 1680px)',
-		large: '(max-width: 1280px)',
-		medium: '(max-width: 1000px)',
-		small: '(max-width: 736px)',
-		xsmall: '(max-width: 480px)',
-	});
+	var	$window = $(window),
+		$body = $('body');
 
-	$(function() {
+	// Breakpoints.
+		breakpoints({
+			default:   ['1681px',   null       ],
+			xlarge:    ['1281px',   '1680px'   ],
+			large:     ['981px',    '1280px'   ],
+			medium:    ['737px',    '980px'    ],
+			small:     ['481px',    '736px'    ],
+			xsmall:    ['361px',    '480px'    ],
+			xxsmall:   [null,       '360px'    ]
+		});
 
-		var	$window = $(window),
-			$body = $('body'),
-			$header = $('#header'),
-			$all = $body.add($header);
+	// Play initial animations on page load.
+		$window.on('load', function() {
+			window.setTimeout(function() {
+				$body.removeClass('is-preload');
+			}, 100);
+		});
 
-		// Disable animations/transitions until the page has loaded.
-			$body.addClass('is-loading');
+	// Hack: Enable IE workarounds.
+		if (browser.name == 'ie')
+			$body.addClass('is-ie');
 
-			$window.on('load', function() {
-				window.setTimeout(function() {
-					$body.removeClass('is-loading');
-				}, 0);
+	// Mobile?
+		if (browser.mobile)
+			$body.addClass('is-mobile');
+
+	// Scrolly.
+		$('.scrolly')
+			.scrolly({
+				offset: 100
 			});
 
-		// Touch mode.
-			skel.on('change', function() {
+	// Polyfill: Object fit.
+		if (!browser.canUse('object-fit')) {
 
-				if (skel.vars.mobile || skel.breakpoint('small').active)
-					$body.addClass('is-touch');
-				else
-					$body.removeClass('is-touch');
+			$('.image[data-position]').each(function() {
 
-			});
+				var $this = $(this),
+					$img = $this.children('img');
 
-		// Fix: Placeholder polyfill.
-			$('form').placeholder();
+				// Apply img as background.
+					$this
+						.css('background-image', 'url("' + $img.attr('src') + '")')
+						.css('background-position', $this.data('position'))
+						.css('background-size', 'cover')
+						.css('background-repeat', 'no-repeat');
 
-		// Fix: IE flexbox fix.
-			if (skel.vars.IEVersion <= 11
-			&&	skel.vars.IEVersion >= 10) {
-
-				var $main = $('.main.fullscreen'),
-					IEResizeTimeout;
-
-				$window
-					.on('resize.ie-flexbox-fix', function() {
-
-						clearTimeout(IEResizeTimeout);
-
-						IEResizeTimeout = setTimeout(function() {
-
-							var wh = $window.height();
-
-							$main.each(function() {
-
-								var $this = $(this);
-
-								$this.css('height', '');
-
-								if ($this.height() <= wh)
-									$this.css('height', (wh - 50) + 'px');
-
-							});
-
-						});
-
-					})
-					.triggerHandler('resize.ie-flexbox-fix');
-
-			}
-
-		// Prioritize "important" elements on small.
-			skel.on('+small -small', function() {
-				$.prioritize(
-					'.important\\28 small\\29',
-					skel.breakpoint('small').active
-				);
-			});
-
-		// Gallery.
-			$window.on('load', function() {
-
-				var $gallery = $('.gallery');
-
-				$gallery.poptrox({
-					baseZIndex: 10001,
-					useBodyOverflow: false,
-					usePopupEasyClose: false,
-					overlayColor: '#1f2328',
-					overlayOpacity: 0.65,
-					usePopupDefaultStyling: false,
-					usePopupCaption: true,
-					popupLoaderText: '',
-					windowMargin: 50,
-					usePopupNav: true
-				});
-
-				// Hack: Adjust margins when 'small' activates.
-					skel
-						.on('-small', function() {
-							$gallery.each(function() {
-								$(this)[0]._poptrox.windowMargin = 50;
-							});
-						})
-						.on('+small', function() {
-							$gallery.each(function() {
-								$(this)[0]._poptrox.windowMargin = 5;
-							});
-						});
+				// Hide img.
+					$img
+						.css('opacity', '0');
 
 			});
 
-		// Section transitions.
-			if (skel.canUse('transition')) {
+			$('.gallery > a').each(function() {
 
-				var on = function() {
+				var $this = $(this),
+					$img = $this.children('img');
 
-					// Galleries.
-						$('.gallery')
-							.scrollex({
-								top:		'30vh',
-								bottom:		'30vh',
-								delay:		50,
-								initialize:	function() { $(this).addClass('inactive'); },
-								terminate:	function() { $(this).removeClass('inactive'); },
-								enter:		function() { $(this).removeClass('inactive'); },
-								leave:		function() { $(this).addClass('inactive'); }
-							});
+				// Apply img as background.
+					$this
+						.css('background-image', 'url("' + $img.attr('src') + '")')
+						.css('background-position', 'center')
+						.css('background-size', 'cover')
+						.css('background-repeat', 'no-repeat');
 
-					// Generic sections.
-						$('.main.style1')
-							.scrollex({
-								mode:		'middle',
-								delay:		100,
-								initialize:	function() { $(this).addClass('inactive'); },
-								terminate:	function() { $(this).removeClass('inactive'); },
-								enter:		function() { $(this).removeClass('inactive'); },
-								leave:		function() { $(this).addClass('inactive'); }
-							});
+				// Hide img.
+					$img
+						.css('opacity', '0');
 
-						$('.main.style2')
-							.scrollex({
-								mode:		'middle',
-								delay:		100,
-								initialize:	function() { $(this).addClass('inactive'); },
-								terminate:	function() { $(this).removeClass('inactive'); },
-								enter:		function() { $(this).removeClass('inactive'); },
-								leave:		function() { $(this).addClass('inactive'); }
-							});
+			});
 
-					// Contact.
-						$('#contact')
-							.scrollex({
-								top:		'50%',
-								delay:		50,
-								initialize:	function() { $(this).addClass('inactive'); },
-								terminate:	function() { $(this).removeClass('inactive'); },
-								enter:		function() { $(this).removeClass('inactive'); },
-								leave:		function() { $(this).addClass('inactive'); }
-							});
+		}
 
-				};
+	// Gallery.
+		$('.gallery')
+			.on('click', 'a', function(event) {
 
-				var off = function() {
+				var $a = $(this),
+					$gallery = $a.parents('.gallery'),
+					$modal = $gallery.children('.modal'),
+					$modalImg = $modal.find('img'),
+					href = $a.attr('href');
 
-					// Galleries.
-						$('.gallery')
-							.unscrollex();
+				// Not an image? Bail.
+					if (!href.match(/\.(jpg|gif|png|mp4)$/))
+						return;
 
-					// Generic sections.
-						$('.main.style1')
-							.unscrollex();
+				// Prevent default.
+					event.preventDefault();
+					event.stopPropagation();
 
-						$('.main.style2')
-							.unscrollex();
+				// Locked? Bail.
+					if ($modal[0]._locked)
+						return;
 
-					// Contact.
-						$('#contact')
-							.unscrollex();
+				// Lock.
+					$modal[0]._locked = true;
 
-				};
+				// Set src.
+					$modalImg.attr('src', href);
 
-				skel.on('change', function() {
+				// Set visible.
+					$modal.addClass('visible');
 
-					if (skel.breakpoint('small').active)
-						(off)();
-					else
-						(on)();
+				// Focus.
+					$modal.focus();
 
-				});
+				// Delay.
+					setTimeout(function() {
 
-			}
+						// Unlock.
+							$modal[0]._locked = false;
 
-		// Events.
-			var resizeTimeout, resizeScrollTimeout;
+					}, 600);
 
-			$window
-				.resize(function() {
+			})
+			.on('click', '.modal', function(event) {
 
-					// Disable animations/transitions.
-						$body.addClass('is-resizing');
+				var $modal = $(this),
+					$modalImg = $modal.find('img');
 
-					window.clearTimeout(resizeTimeout);
+				// Locked? Bail.
+					if ($modal[0]._locked)
+						return;
 
-					resizeTimeout = window.setTimeout(function() {
+				// Already hidden? Bail.
+					if (!$modal.hasClass('visible'))
+						return;
 
-						// Update scrolly links.
-							$('a[href^="#"]').scrolly({
-								speed: 1500,
-								offset: $header.outerHeight() - 1
-							});
+				// Stop propagation.
+					event.stopPropagation();
 
-						// Re-enable animations/transitions.
-							window.setTimeout(function() {
-								$body.removeClass('is-resizing');
-								$window.trigger('scroll');
-							}, 0);
+				// Lock.
+					$modal[0]._locked = true;
 
-					}, 100);
+				// Clear visible, loaded.
+					$modal
+						.removeClass('loaded')
 
-				})
-				.load(function() {
-					$window.trigger('resize');
-				});
+				// Delay.
+					setTimeout(function() {
 
-	});
+						$modal
+							.removeClass('visible')
+
+						setTimeout(function() {
+
+							// Clear src.
+								$modalImg.attr('src', '');
+
+							// Unlock.
+								$modal[0]._locked = false;
+
+							// Focus.
+								$body.focus();
+
+						}, 475);
+
+					}, 125);
+
+			})
+			.on('keypress', '.modal', function(event) {
+
+				var $modal = $(this);
+
+				// Escape? Hide modal.
+					if (event.keyCode == 27)
+						$modal.trigger('click');
+
+			})
+			.on('mouseup mousedown mousemove', '.modal', function(event) {
+
+				// Stop propagation.
+					event.stopPropagation();
+
+			})
+			.prepend('<div class="modal" tabIndex="-1"><div class="inner"><img src="" /></div></div>')
+				.find('img')
+					.on('load', function(event) {
+
+						var $modalImg = $(this),
+							$modal = $modalImg.parents('.modal');
+
+						setTimeout(function() {
+
+							// No longer visible? Bail.
+								if (!$modal.hasClass('visible'))
+									return;
+
+							// Set loaded.
+								$modal.addClass('loaded');
+
+						}, 275);
+
+					});
 
 })(jQuery);
